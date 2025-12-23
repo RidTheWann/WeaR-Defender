@@ -1,0 +1,26 @@
+# Build output
+target/
+*.sys
+*.dll
+*.pdb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Rust
+Cargo.lock
+
+# WDK build artifacts
+*.inf
+*.cat
+*.cer
+
+# Test artifacts
+*.log

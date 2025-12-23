@@ -1,0 +1,82 @@
+;
+; WeaR Defender Driver INF Template
+;
+; This INF file is used to install the WeaR Defender kernel driver.
+; For actual deployment, this needs to be processed and signed.
+;
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = "AntiVirus"                    ; Or SecurityDevices
+ClassGuid   = {b1d1a169-c54f-4379-81db-bee7d88d7454}
+Provider    = %ManufacturerName%
+CatalogFile = wear_defender.cat
+DriverVer   = 12/23/2024,0.1.0.0
+PnpLockdown = 1                              ; Prevent non-PnP access
+
+[DestinationDirs]
+DefaultDestDir       = 12                    ; %windir%\System32\drivers
+WeaRDefender.DriverFiles = 12
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+wear_defender.sys = 1,,
+
+;
+; Driver Install Section
+;
+[DefaultInstall.NT$ARCH$]
+CopyFiles = WeaRDefender.DriverFiles
+
+[DefaultInstall.NT$ARCH$.Services]
+AddService = WeaRDefender, 0x00000002, WeaRDefender.Service
+
+[WeaRDefender.DriverFiles]
+wear_defender.sys
+
+;
+; Service Configuration
+;
+[WeaRDefender.Service]
+DisplayName    = %ServiceDisplayName%
+Description    = %ServiceDescription%
+ServiceBinary  = %12%\wear_defender.sys
+ServiceType    = 1                           ; SERVICE_KERNEL_DRIVER
+StartType      = 0                           ; SERVICE_BOOT_START (earliest load)
+ErrorControl   = 1                           ; SERVICE_ERROR_NORMAL
+LoadOrderGroup = "FSFilter Anti-Virus"       ; Load with other AV filters
+
+;
+; Registry Configuration
+;
+[WeaRDefender.Service.AddReg]
+; Instance configuration
+HKR,, "SupportedFeatures", 0x00010001, 0x3   ; SUPPORTED_FS_FEATURES_OFFLOAD_READ | WRITE
+HKR,, "Instances", 0x00010000, "WeaRDefender Instance"
+HKR, "Instances\WeaRDefender Instance", "Altitude", 0x00000000, "424242"
+HKR, "Instances\WeaRDefender Instance", "Flags", 0x00010001, 0x0
+
+;
+; Uninstall Section
+;
+[DefaultUninstall.NT$ARCH$]
+DelFiles = WeaRDefender.DriverFiles
+DelReg   = WeaRDefender.DelReg
+
+[DefaultUninstall.NT$ARCH$.Services]
+DelService = WeaRDefender, 0x200             ; SPSVCINST_STOPSERVICE
+
+[WeaRDefender.DelReg]
+HKR,, "SupportedFeatures"
+HKR,, "Instances"
+
+;
+; Strings
+;
+[Strings]
+ManufacturerName     = "WeaR Security"
+DiskName             = "WeaR Defender Installation Disk"
+ServiceDisplayName   = "WeaR Defender Security Driver"
+ServiceDescription   = "Kernel-mode endpoint protection driver providing process monitoring, file system protection, and anti-tamper mechanisms."

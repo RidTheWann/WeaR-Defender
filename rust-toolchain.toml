@@ -1,0 +1,18 @@
+# Rust Toolchain Configuration for Windows Kernel Driver Development
+# 
+# RATIONALE: Kernel drivers require nightly Rust for:
+# - #![no_std] with custom panic handlers
+# - Unstable features for kernel memory allocation
+# - rust-src for cross-compilation to kernel target
+
+[toolchain]
+channel = "nightly"
+components = [
+    "rust-src",          # Required for building core/alloc for kernel target
+    "llvm-tools-preview", # Required for generating .sys files
+    "rustfmt",           # Code formatting
+    "clippy",            # Linting
+]
+targets = [
+    "x86_64-pc-windows-msvc",
+]

@@ -1,0 +1,18 @@
+[package]
+name = "wear_defender_common"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Shared types and constants for WeaR Defender driver and user-mode service"
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+default = []
+# Enable std for user-mode components
+std = []
+
+[dependencies]
+# No dependencies - this crate must work in both kernel and user mode

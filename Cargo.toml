@@ -1,0 +1,30 @@
+[workspace]
+resolver = "2"
+members = [
+    "driver",
+    "common",
+]
+
+# Workspace-wide settings for kernel development
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Proprietary"
+authors = ["WeaR Security Team"]
+
+[workspace.dependencies]
+wdk = "0.3"
+wdk-sys = "0.3"
+wdk-alloc = "0.3"
+wdk-panic = "0.3"
+
+[profile.release]
+# Kernel drivers require aggressive optimizations
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+# Even in dev, we must abort on panic (no unwinding in kernel)
+panic = "abort"

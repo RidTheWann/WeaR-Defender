@@ -1,0 +1,36 @@
+[package]
+name = "wear_defender_driver"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+# CRITICAL: cdylib produces a .dll which becomes .sys after proper linking
+[lib]
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[dependencies]
+# Microsoft's official Rust WDK crates
+wdk.workspace = true
+wdk-sys.workspace = true
+wdk-alloc.workspace = true
+wdk-panic.workspace = true
+
+# Shared types with user-mode components
+wear_defender_common = { path = "../common" }
+
+[build-dependencies]
+wdk-build = "0.3"
+
+[features]
+default = ["kmdf"]
+kmdf = []  # Kernel-Mode Driver Framework
+wdm = []   # Windows Driver Model (lower level)
+
+[package.metadata.wdk]
+# Driver metadata for INF generation
+driver-model = "KMDF"
+kmdf-version-major = 1
+kmdf-version-minor = 33
+target-os-version = "Windows 11"

@@ -1,0 +1,44 @@
+# Cargo Configuration for Windows Kernel Driver Target
+#
+# RATIONALE: Kernel drivers have special linking requirements:
+# - Native subsystem must be set to NATIVE (not CONSOLE/WINDOWS)
+# - Entry point must be DriverEntry
+# - No default libraries (kernel provides its own runtime)
+
+[build]
+target = "x86_64-pc-windows-msvc"
+
+[target.x86_64-pc-windows-msvc]
+# Kernel driver subsystem configuration
+rustflags = [
+    # Use LLVM linker for better compatibility with WDK
+    "-C", "linker=lld-link",
+    
+    # CRITICAL: Set subsystem to NATIVE for kernel drivers
+    "-C", "link-arg=/SUBSYSTEM:NATIVE",
+    
+    # Driver entry point
+    "-C", "link-arg=/ENTRY:DriverEntry",
+    
+    # Disable default runtime libraries (kernel has its own)
+    "-C", "link-arg=/NODEFAULTLIB",
+    
+    # Enable Control Flow Guard for HVCI compliance
+    "-C", "control-flow-guard=yes",
+    
+    # Stack size for kernel (default is often too small)
+    "-C", "link-arg=/STACK:0x40000,0x40000",
+    
+    # Merge .rdata and .pdata for smaller binary
+    "-C", "link-arg=/MERGE:.rdata=.text",
+    
+    # Driver-specific options
+    "-C", "link-arg=/DRIVER",
+    
+    # Integrity check for HVCI
+    "-C", "link-arg=/INTEGRITYCHECK",
+]
+
+[env]
+# Ensure WDK is found (user should have WDK installed)
+# These can be overridden by environment variables
